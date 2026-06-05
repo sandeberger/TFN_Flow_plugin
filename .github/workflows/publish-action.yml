@@ -1,0 +1,50 @@
+name: Publish Release
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/*'
+      - 'README.md'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    permissions:
+      contents: write   # required for softprops/action-gh-release to create the release/tag
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Read version from plugin.json
+        id: version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: 'plugin.json'
+          prop_path: 'Version'
+
+      - name: Build, package, and strip host SDK dll
+        shell: pwsh
+        run: |
+          $ver = '${{ steps.version.outputs.prop }}'
+          $out = "FileNinja-$ver"
+          dotnet publish 'FileNinja.FlowLauncher.csproj' -c Release -r win-x64 --no-self-contained -o $out
+          if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
+          # Flow.Launcher loads its own Flow.Launcher.Plugin.dll. Shipping a second
+          # copy makes the host resolve two distinct IAsyncPlugin types and can hang
+          # it at load time (see PluginPackagingTests). Strip it from the zip.
+          Remove-Item "$out/Flow.Launcher.Plugin.dll" -ErrorAction SilentlyContinue
+          7z a -tzip "FileNinja-$ver.zip" "./$out/*"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: 'FileNinja-*.zip'
+          tag_name: 'v${{ steps.version.outputs.prop }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
