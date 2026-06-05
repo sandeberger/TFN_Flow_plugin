@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Match the plugin TFM so the test process loads the exact same BCL surface. -->
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <AssemblyName>FileNinja.FlowLauncher.Tests</AssemblyName>
+    <RootNamespace>FileNinja.FlowLauncher.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileNinja.FlowLauncher.csproj" />
+    <!-- The plugin project excludes Flow.Launcher.Plugin at runtime (Flow.Launcher
+         provides it). Tests still need the SDK assembly loaded — re-include it here. -->
+    <PackageReference Include="Flow.Launcher.Plugin" Version="4.7.0" />
+  </ItemGroup>
+
+</Project>

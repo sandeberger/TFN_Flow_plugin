@@ -1,0 +1,12 @@
+{
+  "ID": "8B0D62F4F2C44F18B8CB4A6BAD1F0001",
+  "ActionKeyword": "fn",
+  "Name": "FileNinja",
+  "Description": "Browse FileNinja URLs (qry://, tag://) from Flow.Launcher",
+  "Author": "Joakim",
+  "Version": "0.1.0",
+  "Language": "csharp",
+  "Website": "https://thefile.ninja",
+  "IcoPath": "Icon.png",
+  "ExecuteFileName": "FileNinja.FlowLauncher.dll"
+}

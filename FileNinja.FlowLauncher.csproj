@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Match the official Flow.Launcher dotnet-template and HelloWorldCSharp
+         sample. net7.0-windows is the most compatible target across Flow.Launcher
+         versions; Flow 2.x runs on net9 and loads net7 assemblies cleanly via
+         runtime rollforward. Higher TFMs (net8/net9) occasionally hang at WPF
+         type resolution on Flow versions that don't ship that runtime. -->
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <OutputType>Library</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>FileNinja.FlowLauncher</RootNamespace>
+    <AssemblyName>FileNinja.FlowLauncher</AssemblyName>
+    <Version>0.1.0</Version>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- Flat output: bin/<cfg>/ instead of bin/<cfg>/net7.0-windows/. Matches
+         what Flow.Launcher's installer expects to find inside a plugin zip. -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <!-- Release builds drop PDBs — mirrors the official dotnet-template. -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="tests\**" />
+    <EmbeddedResource Remove="tests\**" />
+    <None Remove="tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Flow.Launcher.Plugin 4.7.0 is the latest 4.x release. The 5.x line
+         targets net9 only, which would force the same TFM here and reduce
+         compatibility with older Flow.Launcher installs. -->
+    <PackageReference Include="Flow.Launcher.Plugin" Version="4.7.0" />
+    <!-- Build-time annotation library; no runtime value. PrivateAssets=all
+         keeps it from leaking into the plugin output. -->
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" ExcludeAssets="runtime" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FileNinja.FlowLauncher.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="plugin.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
